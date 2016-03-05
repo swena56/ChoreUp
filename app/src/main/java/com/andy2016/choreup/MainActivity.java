@@ -1,8 +1,10 @@
 package com.andy2016.choreup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,8 +40,18 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
+
+        DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+
+
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //go to database info activity
+        Intent intent = new Intent(this,AddChore.class);
+        startActivity(intent);
     }
 
     @Override
@@ -83,13 +95,13 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
-
+            Log.d("UI","nav_gallery clicked");
         } else if (id == R.id.nav_slideshow) {
-
+            Log.d("UI","nav_slideshow was clicked");
         } else if (id == R.id.nav_manage) {
-
+            Log.d("UI","nav_manage was clicked");
         } else if (id == R.id.nav_share) {
-
+            Log.d("UI","nav_share was clicked");
         } else if (id == R.id.nav_send) {
 
         }
