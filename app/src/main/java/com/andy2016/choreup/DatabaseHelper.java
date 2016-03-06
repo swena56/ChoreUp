@@ -20,6 +20,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public void getArrayList()
+    {
+
+
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 

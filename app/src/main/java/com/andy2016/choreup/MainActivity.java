@@ -1,6 +1,8 @@
 package com.andy2016.choreup;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,9 +16,49 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    ListView listView;
+
+    class StableArrayAdapter extends BaseAdapter
+    {
+        public StableArrayAdapter(MainActivity mainActivity, int simple_expandable_list_item_1, String[] values) {
+
+        }
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return null;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +67,46 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //get the contents of database
+        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        final ArrayList<String> list = new ArrayList<String>();
+        String query = "SELECT * FROM " + ChoreEntry.TABLE_NAME;
+        Cursor c = db.rawQuery(query, null);
+        if(c.moveToFirst())
+        {
+            do{
+                list.add(c.getColumnName(1) + ","+  c.getString(c.getColumnIndex(ChoreEntry.COLUMN_NAME_CHORE_NAME)));
+                Log.d("db","columnCount: "+ c.getColumnCount()
+                                + "\n" + c.getColumnName(1) + ","+  c.getString(c.getColumnIndex(ChoreEntry.COLUMN_NAME_CHORE_NAME))
+                );
+            }while(c.moveToNext());
+        }
+        db.close();
+
+        ArrayAdapter<String> stableArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1,list);
+
+        //initalize list view
+        listView = (ListView) findViewById(R.id.ListView);
+        listView.setAdapter(stableArrayAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), "Clicked on Item num " + position, Toast.LENGTH_LONG).show();
+            }
+        });
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Lets add a chore", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                //go to add chore activity
+                Intent intent = new Intent(MainActivity.this,AddChore.class);
+                startActivity(intent);
             }
         });
 
@@ -41,19 +117,11 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
 
-
-        DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
-
-
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //go to database info activity
-        Intent intent = new Intent(this,AddChore.class);
-        startActivity(intent);
     }
 
+    protected void onResume(Bundle savedInstanceState){}
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
